@@ -2,7 +2,7 @@ package org.ncidence.resteasy.exceptions;
 
 import org.springframework.http.HttpStatus;
 
-public class ProjectEntityException extends Exception{
+public class HttpRequestException extends Exception{
 	/**
 	 * 
 	 */
@@ -10,7 +10,7 @@ public class ProjectEntityException extends Exception{
 	
 	private HttpStatus statusCode;
 
-	public ProjectEntityException(String message, HttpStatus statusCode) {
+	public HttpRequestException(String message, HttpStatus statusCode) {
 		super(message);
 		this.statusCode = statusCode;
 	}

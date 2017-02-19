@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.dozer.DozerBeanMapper;
 import org.dozer.Mapper;
-import org.ncidence.resteasy.exceptions.ProjectEntityException;
+import org.ncidence.resteasy.exceptions.HttpRequestException;
 import org.ncidence.resteasy.models.Project;
 import org.springframework.http.HttpStatus;
 
@@ -19,15 +19,15 @@ public class ProjectRepository {
 	private static Map<Long, ProjectEntity> projectIdMap = new HashMap<>();
 	private static Map<String, ProjectEntity> projectNameMap = Collections.synchronizedMap(new HashMap<>());
 
-	public static Long create(Project project) throws ProjectEntityException {
+	public static Long create(Project project) throws HttpRequestException {
 		if (project.getName() == null || project.getName().trim().isEmpty()) {
-			throw new ProjectEntityException("project name is required", HttpStatus.BAD_REQUEST);
+			throw new HttpRequestException("project name is required", HttpStatus.BAD_REQUEST);
 		}
 		String name = lowerTrim(project.getName());
 		ProjectEntity projectEntity = null;
 		synchronized (projectNameMap) {
 			if (projectNameMap.containsKey(name)) {
-				throw new ProjectEntityException("Project name already exists.", HttpStatus.CONFLICT);
+				throw new HttpRequestException("Project name already exists.", HttpStatus.CONFLICT);
 			}
 			
 			project.setId(projectIdFactory.incrementAndGet());
@@ -42,16 +42,16 @@ public class ProjectRepository {
 		return project.getId();
 	}
 	
-	public static ProjectEntity update(Project project) throws ProjectEntityException {
+	public static ProjectEntity update(Project project) throws HttpRequestException {
 		ProjectEntity projectEntity = null;
 		
 		String name = lowerTrim(project.getName());
 		synchronized (projectNameMap) {
 			if (projectNameMap.containsKey(name) && !projectNameMap.get(name).equals(project)) {
-				throw new ProjectEntityException("Project name already exists.", HttpStatus.CONFLICT);
+				throw new HttpRequestException("Project name already exists.", HttpStatus.CONFLICT);
 			}
 			if (!projectIdMap.containsKey(project.getId())) {
-				throw new ProjectEntityException("ID not found.", HttpStatus.NOT_FOUND);
+				throw new HttpRequestException("ID not found.", HttpStatus.NOT_FOUND);
 			}
 			
 			projectEntity = toEntity(project);
@@ -78,9 +78,9 @@ public class ProjectRepository {
 		return deleted;
 	}
 	
-	public static ProjectEntity getProject(Long id) throws ProjectEntityException {
+	public static ProjectEntity getProject(Long id) throws HttpRequestException {
 		if (!projectIdMap.containsKey(id)) {
-			throw new ProjectEntityException("ID not found.", HttpStatus.NOT_FOUND);
+			throw new HttpRequestException("ID not found.", HttpStatus.NOT_FOUND);
 		}
 		return projectIdMap.get(id);
 	}

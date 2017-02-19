@@ -3,7 +3,7 @@ package org.ncidence.resteasy.apicontrollers;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.ncidence.resteasy.exceptions.ProjectEntityException;
+import org.ncidence.resteasy.exceptions.HttpRequestException;
 import org.ncidence.resteasy.models.Project;
 import org.ncidence.resteasy.persistence.ProjectEntity;
 import org.ncidence.resteasy.persistence.ProjectRepository;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -33,19 +32,7 @@ public class ProjectController {
 	@RequestMapping(value = END_POINT, method = RequestMethod.OPTIONS)
 	public ResponseEntity<String> options() {
 		HttpHeaders responseHeaders = new HttpHeaders();
-		responseHeaders.set("Allow", "OPTIONS,POST,PUT,DELETE");
-		return new ResponseEntity<>(responseHeaders, HttpStatus.OK);
-	}
-	
-	
-	/**
-	 * 
-	 * @return
-	 */
-	@RequestMapping(value = END_POINT + "/{id}", method = RequestMethod.OPTIONS)
-	public ResponseEntity<String> options(@PathVariable(value = "id") Long id) {
-		HttpHeaders responseHeaders = new HttpHeaders();
-		responseHeaders.set("Allow", "OPTIONS,HEAD,GET");
+		responseHeaders.set("Allow", "OPTIONS,GET,HEAD,POST,PUT,DELETE");
 		return new ResponseEntity<>(responseHeaders, HttpStatus.OK);
 	}
 	
@@ -55,8 +42,8 @@ public class ProjectController {
 	 * @return
 	 */
 	@RequestMapping(value = END_POINT + "/{id}", method = RequestMethod.HEAD)
-	public ResponseEntity<ResponseBase> head(@PathVariable(value = "id") Long id) {
-		return getAndHeadHelper(id, false, null);
+	public ResponseEntity<ResponseBase> head(@PathVariable(value = "id") Long id, @RequestHeader HttpHeaders headers) {
+		return getAndHeadHelper(id, false, headers);
 	}
 	
 	
@@ -77,7 +64,7 @@ public class ProjectController {
 	 * @param isGet
 	 * @return
 	 */
-	private ResponseEntity<ResponseBase> getAndHeadHelper(Long id, boolean isGet, HttpHeaders headers) {
+	private ResponseEntity<ResponseBase> getAndHeadHelper(Long id, boolean isGet, HttpHeaders requestHeaders) {
 
 		ProjectResponse projectResponse = new ProjectResponse();
 
@@ -85,12 +72,11 @@ public class ProjectController {
 
 		try {
 			ProjectEntity projectEntity = ProjectRepository.getProject(id);
-			responseHeaders.setLastModified(projectEntity.getLastModified().getTime());
-			responseHeaders.setETag(projectEntity.getEtag());
+			setResponseHeadersAndValidateConditions(projectEntity, responseHeaders, requestHeaders);
 			if(isGet){
 				projectResponse.setData(ProjectRepository.toModel(projectEntity));
 			}
-		} catch (ProjectEntityException e) {
+		} catch (HttpRequestException e) {
 			ResponseBase errorResponse = new ResponseBase();
 			errorResponse.setMessage(e.getMessage());
 			return new ResponseEntity<ResponseBase>(errorResponse, e.getStatusCode());
@@ -106,6 +92,12 @@ public class ProjectController {
 
 		return responseEntity;
 	}
+	
+	private void setResponseHeadersAndValidateConditions(ProjectEntity projectEntity, HttpHeaders responseHeaders, HttpHeaders requestHeaders) throws HttpRequestException{
+		responseHeaders.setLastModified(projectEntity.getLastModified().getTime());
+		responseHeaders.setETag(projectEntity.getEtag());
+		HeadersUtil.checkIfMatch(requestHeaders, projectEntity.getEtag());
+	}
 
 	/**
 	 * 
@@ -114,10 +106,10 @@ public class ProjectController {
 	 * @return
 	 */
 	@RequestMapping(value = END_POINT, method = RequestMethod.POST)
-	public ResponseEntity<ResponseBase> post(Project project, @RequestHeader HttpHeaders headers) {
+	public ResponseEntity<ResponseBase> post(Project project, @RequestHeader HttpHeaders requestHeaders) {
 
-		if (!headers.containsKey(HEADER_HOST) || headers.get(HEADER_HOST) == null
-				|| headers.get(HEADER_HOST).isEmpty()) {
+		if (!requestHeaders.containsKey(HEADER_HOST) || requestHeaders.get(HEADER_HOST) == null
+				|| requestHeaders.get(HEADER_HOST).isEmpty()) {
 			ResponseBase errorResponse = new ResponseBase();
 			errorResponse.setMessage(HEADER_HOST + " header is required.");
 			return new ResponseEntity<ResponseBase>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -126,7 +118,7 @@ public class ProjectController {
 		try {
 			Long id = ProjectRepository.create(project);
 			project.setId(id);
-		} catch (ProjectEntityException e) {
+		} catch (HttpRequestException e) {
 			ResponseBase errorResponse = new ResponseBase();
 			errorResponse.setMessage(e.getMessage());
 			return new ResponseEntity<ResponseBase>(errorResponse, e.getStatusCode());
@@ -136,7 +128,7 @@ public class ProjectController {
 
 		HttpHeaders responseHeaders = new HttpHeaders();
 
-		String host = headers.get(HEADER_HOST).get(0);
+		String host = requestHeaders.get(HEADER_HOST).get(0);
 		URI location = null;
 
 		try {
@@ -163,15 +155,14 @@ public class ProjectController {
 	 * @return
 	 */
 	@RequestMapping(value = END_POINT, method = RequestMethod.PUT)
-	public ResponseEntity<ResponseBase> put(Project project, @RequestHeader HttpHeaders headers) {
+	public ResponseEntity<ResponseBase> put(Project project, @RequestHeader HttpHeaders requestHeaders) {
 
 		HttpHeaders responseHeaders = new HttpHeaders();
 		
 		try {
 			ProjectEntity projectEntity = ProjectRepository.update(project);
-			responseHeaders.setLastModified(projectEntity.getLastModified().getTime());
-			responseHeaders.setETag(projectEntity.getEtag());
-		} catch (ProjectEntityException e) {
+			setResponseHeadersAndValidateConditions(projectEntity, responseHeaders, requestHeaders);
+		} catch (HttpRequestException e) {
 			ResponseBase errorResponse = new ResponseBase();
 			errorResponse.setMessage(e.getMessage());
 			return new ResponseEntity<ResponseBase>(errorResponse, e.getStatusCode());
@@ -191,8 +182,20 @@ public class ProjectController {
 	 * @param id
 	 * @return
 	 */
-	@RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-	public ResponseEntity<ResponseBase> delete(@RequestParam(value = "id", required = false, defaultValue = "") Long id, @RequestHeader HttpHeaders headers) {
+	@RequestMapping(value = END_POINT + "/{id}", method = RequestMethod.DELETE)
+	public ResponseEntity<ResponseBase> delete(@PathVariable(value = "id") Long id, @RequestHeader HttpHeaders requestHeaders) {
+		
+		HttpHeaders responseHeaders = new HttpHeaders();
+
+		try {
+			ProjectEntity projectEntity = ProjectRepository.getProject(id);
+			setResponseHeadersAndValidateConditions(projectEntity, responseHeaders, requestHeaders);
+		} catch (HttpRequestException e) {
+			ResponseBase errorResponse = new ResponseBase();
+			errorResponse.setMessage(e.getMessage());
+			return new ResponseEntity<ResponseBase>(errorResponse, e.getStatusCode());
+		}
+		
 		boolean deleted = ProjectRepository.delete(id);
 		ResponseEntity<ResponseBase> response = new ResponseEntity<ResponseBase>(deleted ? HttpStatus.NO_CONTENT : HttpStatus.NOT_FOUND);
 		return response;
