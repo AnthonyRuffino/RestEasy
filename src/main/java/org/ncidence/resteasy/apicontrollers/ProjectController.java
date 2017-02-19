@@ -97,6 +97,7 @@ public class ProjectController {
 		responseHeaders.setLastModified(projectEntity.getLastModified().getTime());
 		responseHeaders.setETag(projectEntity.getEtag());
 		HeadersUtil.checkIfMatch(requestHeaders, projectEntity.getEtag());
+		HeadersUtil.checkIfUnModifiedSInce(requestHeaders, projectEntity.getLastModified());
 	}
 
 	/**
