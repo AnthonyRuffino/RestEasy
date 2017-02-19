@@ -96,8 +96,13 @@ public class ProjectController {
 	private void setResponseHeadersAndValidateConditions(ProjectEntity projectEntity, HttpHeaders responseHeaders, HttpHeaders requestHeaders) throws HttpRequestException{
 		responseHeaders.setLastModified(projectEntity.getLastModified().getTime());
 		responseHeaders.setETag(projectEntity.getEtag());
+		
 		HeadersUtil.checkIfMatch(requestHeaders, projectEntity.getEtag());
-		HeadersUtil.checkIfUnModifiedSInce(requestHeaders, projectEntity.getLastModified());
+		HeadersUtil.checkIfUnModifiedSince(requestHeaders, projectEntity.getLastModified());
+		//TODO: CHeck how exactly Spring Boot is taking care of If-Modified-Since
+		//HeadersUtil.checkIfModifiedSince(requestHeaders, projectEntity.getLastModified());
+		
+		
 	}
 
 	/**

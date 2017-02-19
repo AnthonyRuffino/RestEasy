@@ -27,7 +27,7 @@ public class HeadersUtil {
 		throw new HttpRequestException("No match", HttpStatus.PRECONDITION_FAILED);
 	}
 
-	public static void checkIfUnModifiedSInce(HttpHeaders requestHeaders, Date lastModified)
+	public static void checkIfUnModifiedSince(HttpHeaders requestHeaders, Date lastModified)
 			throws HttpRequestException {
 		if (!requestHeaders.containsKey(HttpHeaders.IF_UNMODIFIED_SINCE)) {
 			return;
@@ -36,7 +36,27 @@ public class HeadersUtil {
 		Instant instantTruncated = instant.truncatedTo( ChronoUnit.SECONDS );
 		long epochLastModified = instantTruncated.getEpochSecond();
 		if (epochLastModified > requestHeaders.getIfUnmodifiedSince()) {
-			throw new HttpRequestException("Modified: " + epochLastModified + ">" + requestHeaders.getIfUnmodifiedSince(), HttpStatus.PRECONDITION_FAILED);
+			throw new HttpRequestException("Modified", HttpStatus.PRECONDITION_FAILED);
+		}
+	}
+	
+	public static void checkIfModifiedSince(HttpHeaders requestHeaders, Date lastModified)
+			throws HttpRequestException {
+		if (!requestHeaders.containsKey(HttpHeaders.IF_MODIFIED_SINCE)) {
+			return;
+		}
+		
+		Instant nowInstantTruncated = new Date().toInstant().truncatedTo( ChronoUnit.SECONDS );
+		long epochNow = nowInstantTruncated.getEpochSecond();
+		if (requestHeaders.getIfModifiedSince() > epochNow) {
+			return;
+		}
+		
+		Instant instant = lastModified.toInstant();
+		Instant instantTruncated = instant.truncatedTo( ChronoUnit.SECONDS );
+		long epochLastModified = instantTruncated.getEpochSecond();
+		if (requestHeaders.getIfModifiedSince() > epochLastModified) {
+			throw new HttpRequestException("Not Modified", HttpStatus.NOT_MODIFIED);
 		}
 	}
 }
