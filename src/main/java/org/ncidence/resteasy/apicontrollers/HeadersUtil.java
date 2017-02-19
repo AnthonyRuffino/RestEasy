@@ -26,6 +26,25 @@ public class HeadersUtil {
 
 		throw new HttpRequestException("No match", HttpStatus.PRECONDITION_FAILED);
 	}
+	
+	public static void checkIfNoneMatch(HttpHeaders requestHeaders, String etag, boolean isGetOrHead) throws HttpRequestException {
+		if (requestHeaders.getIfNoneMatch() == null || requestHeaders.getIfNoneMatch().isEmpty()) {
+			return;
+		}
+
+		for (String ifMatch : requestHeaders.getIfMatch()) {
+			if (ifMatch == null) {
+				continue;
+			}
+			if (ifMatch.equals("*") || ifMatch.equals(etag)) {
+				if(isGetOrHead){
+					throw new HttpRequestException("Match", HttpStatus.NOT_MODIFIED);
+				}else{
+					throw new HttpRequestException("Match", HttpStatus.PRECONDITION_FAILED);
+				}
+			}
+		}
+	}
 
 	public static void checkIfUnModifiedSince(HttpHeaders requestHeaders, Date lastModified)
 			throws HttpRequestException {

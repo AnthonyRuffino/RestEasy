@@ -72,7 +72,7 @@ public class ProjectController {
 
 		try {
 			ProjectEntity projectEntity = ProjectRepository.getProject(id);
-			setResponseHeadersAndValidateConditions(projectEntity, responseHeaders, requestHeaders);
+			setResponseHeadersAndValidateConditions(projectEntity, responseHeaders, requestHeaders, true);
 			if(isGet){
 				projectResponse.setData(ProjectRepository.toModel(projectEntity));
 			}
@@ -93,14 +93,15 @@ public class ProjectController {
 		return responseEntity;
 	}
 	
-	private void setResponseHeadersAndValidateConditions(ProjectEntity projectEntity, HttpHeaders responseHeaders, HttpHeaders requestHeaders) throws HttpRequestException{
+	private void setResponseHeadersAndValidateConditions(ProjectEntity projectEntity, HttpHeaders responseHeaders, HttpHeaders requestHeaders, boolean isGetOrHead) throws HttpRequestException{
 		responseHeaders.setLastModified(projectEntity.getLastModified().getTime());
 		responseHeaders.setETag(projectEntity.getEtag());
 		
 		HeadersUtil.checkIfMatch(requestHeaders, projectEntity.getEtag());
 		HeadersUtil.checkIfUnModifiedSince(requestHeaders, projectEntity.getLastModified());
-		//TODO: CHeck how exactly Spring Boot is taking care of If-Modified-Since
+		//TODO: Check how exactly Spring Boot is taking care of If-Modified-Since
 		//HeadersUtil.checkIfModifiedSince(requestHeaders, projectEntity.getLastModified());
+		HeadersUtil.checkIfNoneMatch(requestHeaders, projectEntity.getEtag(), isGetOrHead);
 		
 		
 	}
@@ -167,7 +168,7 @@ public class ProjectController {
 		
 		try {
 			ProjectEntity projectEntity = ProjectRepository.update(project);
-			setResponseHeadersAndValidateConditions(projectEntity, responseHeaders, requestHeaders);
+			setResponseHeadersAndValidateConditions(projectEntity, responseHeaders, requestHeaders, false);
 		} catch (HttpRequestException e) {
 			ResponseBase errorResponse = new ResponseBase();
 			errorResponse.setMessage(e.getMessage());
@@ -195,7 +196,7 @@ public class ProjectController {
 
 		try {
 			ProjectEntity projectEntity = ProjectRepository.getProject(id);
-			setResponseHeadersAndValidateConditions(projectEntity, responseHeaders, requestHeaders);
+			setResponseHeadersAndValidateConditions(projectEntity, responseHeaders, requestHeaders, false);
 		} catch (HttpRequestException e) {
 			ResponseBase errorResponse = new ResponseBase();
 			errorResponse.setMessage(e.getMessage());
