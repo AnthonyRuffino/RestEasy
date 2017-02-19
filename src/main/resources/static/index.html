@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" ng-app>
 <head>
-<title>Plaude</title>
+<title>RestEasy</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body {
@@ -10,19 +10,21 @@ body {
 </style>
 </head>
 <body>
-	<h1>Rest Easy</h1>
+	<h1>Rest Easy (usage)</h1>
 	<br />
-	<br /> POST /add?url=www.example.com
-	<br /> -result: {url:"/www.example.com}", id:""exampleId"
+	<br /> OPTIONS /project
 	<br />
-	<br /> PUT /update?id=exampleId,url=www.newexample.com
-	<br /> -result: {url:"/exampleId}", id:""exampleId"
+	<br /> POST /project?name=Test1&owner=Me
 	<br />
-	<br /> DELETE /delete?id=exampleId
-	<br /> -result: {url:"/exampleId}", id:""exampleId"
+	<br /> PUT /project?id=1,name=Test1-1
 	<br />
-	<br /> GET /get/exampleId
-	<br /> -301 Redirect to www.example.com
+	<br /> DELETE /project?id=1
+	<br />
+	<br /> OPTIONS /project/1
+	<br />
+	<br /> HEAD /project/1
+	<br />
+	<br /> GET /project/1
 	<br />
 	<br />
 </body>
