@@ -1,4 +1,4 @@
-package de.leverton.urlshortener.anthonyruffino;
+package org.ncidence.resteasy;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,33 +11,6 @@ import org.springframework.web.servlet.ModelAndView;
 public class ApiController {
 
 	UrlShortener urlShortener = new UrlShortener();
-
-	@RequestMapping("/")
-	public String index() {
-
-		StringBuilder stringBuilder = new StringBuilder("<h1>Anthony's URL Shortener!</h1>");
-
-		stringBuilder.append("<br/>");
-		stringBuilder.append("<br/>");
-
-		addApiActionMessage(stringBuilder, "POST /add?url=www.example.com",
-				"  -result: {url:\"/www.example.com}\", id:\"\"exampleId\"");
-		addApiActionMessage(stringBuilder, "PUT /update?id=exampleId,url=www.newexample.com",
-				"  -result: {url:\"/exampleId}\", id:\"\"exampleId\"");
-		addApiActionMessage(stringBuilder, "DELETE /delete?id=exampleId",
-				"  -result: {url:\"/exampleId}\", id:\"\"exampleId\"");
-		addApiActionMessage(stringBuilder, "GET /get/exampleId", "  -301 Redirect to www.example.com");
-
-		return stringBuilder.toString();
-	}
-
-	private void addApiActionMessage(StringBuilder stringBuilder, String action, String result) {
-		stringBuilder.append(action);
-		stringBuilder.append("<br/>");
-		stringBuilder.append(result);
-		stringBuilder.append("<br/>");
-		stringBuilder.append("<br/>");
-	}
 
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
 	public ShortenedUrlResponse add(@RequestParam(value = "url", required = false, defaultValue = "") String url) {

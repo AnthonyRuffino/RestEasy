@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" ng-app>
+<head>
+<title>Plaude</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+	padding-top: 10px;
+}
+</style>
+</head>
+<body>
+	<h1>Rest Easy</h1>
+	<br />
+	<br /> POST /add?url=www.example.com
+	<br /> -result: {url:"/www.example.com}", id:""exampleId"
+	<br />
+	<br /> PUT /update?id=exampleId,url=www.newexample.com
+	<br /> -result: {url:"/exampleId}", id:""exampleId"
+	<br />
+	<br /> DELETE /delete?id=exampleId
+	<br /> -result: {url:"/exampleId}", id:""exampleId"
+	<br />
+	<br /> GET /get/exampleId
+	<br /> -301 Redirect to www.example.com
+	<br />
+	<br />
+</body>
+</html>

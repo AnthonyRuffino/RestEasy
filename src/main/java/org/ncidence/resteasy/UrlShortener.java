@@ -1,4 +1,4 @@
-package de.leverton.urlshortener.anthonyruffino;
+package org.ncidence.resteasy;
 
 import java.util.HashMap;
 import java.util.Map;

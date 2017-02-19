@@ -1,4 +1,4 @@
-package de.leverton.urlshortener.anthonyruffino;
+package org.ncidence.resteasy;
 
 public class ShortenedUrlResponse {
 	private String id;
