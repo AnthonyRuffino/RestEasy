@@ -7,6 +7,7 @@ import java.util.Date;
 import org.ncidence.resteasy.exceptions.HttpRequestException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 public class HeadersUtil {
 
@@ -26,8 +27,9 @@ public class HeadersUtil {
 
 		throw new HttpRequestException("No match", HttpStatus.PRECONDITION_FAILED);
 	}
-	
-	public static void checkIfNoneMatch(HttpHeaders requestHeaders, String etag, boolean isGetOrHead) throws HttpRequestException {
+
+	public static void checkIfNoneMatch(HttpHeaders requestHeaders, String etag, RequestMethod method)
+			throws HttpRequestException {
 		if (requestHeaders.getIfNoneMatch() == null || requestHeaders.getIfNoneMatch().isEmpty()) {
 			return;
 		}
@@ -37,9 +39,9 @@ public class HeadersUtil {
 				continue;
 			}
 			if (ifMatch.equals("*") || ifMatch.equals(etag)) {
-				if(isGetOrHead){
+				if (method == RequestMethod.GET || method == RequestMethod.HEAD) {
 					throw new HttpRequestException("Match", HttpStatus.NOT_MODIFIED);
-				}else{
+				} else {
 					throw new HttpRequestException("Match", HttpStatus.PRECONDITION_FAILED);
 				}
 			}
@@ -52,27 +54,26 @@ public class HeadersUtil {
 			return;
 		}
 		Instant instant = lastModified.toInstant();
-		Instant instantTruncated = instant.truncatedTo( ChronoUnit.SECONDS );
+		Instant instantTruncated = instant.truncatedTo(ChronoUnit.SECONDS);
 		long epochLastModified = instantTruncated.getEpochSecond();
 		if (epochLastModified > requestHeaders.getIfUnmodifiedSince()) {
 			throw new HttpRequestException("Modified", HttpStatus.PRECONDITION_FAILED);
 		}
 	}
-	
-	public static void checkIfModifiedSince(HttpHeaders requestHeaders, Date lastModified)
-			throws HttpRequestException {
+
+	public static void checkIfModifiedSince(HttpHeaders requestHeaders, Date lastModified) throws HttpRequestException {
 		if (!requestHeaders.containsKey(HttpHeaders.IF_MODIFIED_SINCE)) {
 			return;
 		}
-		
-		Instant nowInstantTruncated = new Date().toInstant().truncatedTo( ChronoUnit.SECONDS );
+
+		Instant nowInstantTruncated = new Date().toInstant().truncatedTo(ChronoUnit.SECONDS);
 		long epochNow = nowInstantTruncated.getEpochSecond();
 		if (requestHeaders.getIfModifiedSince() > epochNow) {
 			return;
 		}
-		
+
 		Instant instant = lastModified.toInstant();
-		Instant instantTruncated = instant.truncatedTo( ChronoUnit.SECONDS );
+		Instant instantTruncated = instant.truncatedTo(ChronoUnit.SECONDS);
 		long epochLastModified = instantTruncated.getEpochSecond();
 		if (requestHeaders.getIfModifiedSince() > epochLastModified) {
 			throw new HttpRequestException("Not Modified", HttpStatus.NOT_MODIFIED);

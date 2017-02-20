@@ -1,8 +1,10 @@
 package org.ncidence.resteasy.persistence;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -85,12 +87,45 @@ public class ProjectRepository {
 		return projectIdMap.get(id);
 	}
 	
+	public static List<ProjectEntity> findAll() throws HttpRequestException {
+		if(projectIdMap.isEmpty()){
+			return null;
+		}
+		List<ProjectEntity> projects = new ArrayList<>(projectIdMap.values());
+		Collections.sort(projects, ProjectEntity.compareById);
+		return new ArrayList<>(projects);
+	}
+	
 	public static ProjectEntity toEntity(Project project){
 		return mapper.map(project, ProjectEntity.class);
 	}
 	
+	public static List<ProjectEntity> toEntities(List<Project> projects){
+		if(projects == null){
+			return null;
+		}
+		
+		List<ProjectEntity> projectEntities = new ArrayList<>();
+		for(Project project : projects){
+			projectEntities.add(toEntity(project));
+		}
+		return projectEntities;
+	}
+	
 	public static Project toModel(ProjectEntity projectEntity){
 		return mapper.map(projectEntity, Project.class);
+	}
+	
+	public static List<Project> toModels(List<ProjectEntity> projectEntities){
+		if(projectEntities == null){
+			return null;
+		}
+		
+		List<Project> projects = new ArrayList<>();
+		for(ProjectEntity projectEntity : projectEntities){
+			projects.add(toModel(projectEntity));
+		}
+		return projects;
 	}
 	
 	private static String lowerTrim(String name){

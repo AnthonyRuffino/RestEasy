@@ -1,5 +1,6 @@
 package org.ncidence.resteasy.persistence;
 
+import java.util.Comparator;
 import java.util.Date;
 
 public class ProjectEntity {
@@ -59,5 +60,14 @@ public class ProjectEntity {
 	public void setEtag(String etag) {
 		this.etag = etag;
 	}
+	
+	
+	//region static comparators
+	public static Comparator<ProjectEntity> compareById = new Comparator<ProjectEntity>() {
+	    public int compare(ProjectEntity left, ProjectEntity right) {
+	        return left.getId().compareTo(right.getId());
+	    }
+	};
+	//endregion static comparators
 
 }
