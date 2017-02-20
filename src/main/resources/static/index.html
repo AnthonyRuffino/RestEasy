@@ -3,22 +3,15 @@
 <head>
 <title>Rest Easy</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/x-icon"
-	href="/img/favicon.ico?version=1">
+<link rel="icon" type="image/x-icon" href="/img/favicon.ico?version=1">
+<link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/bootstrap.min.css">
 <link rel="stylesheet" href="/css/bootstrap-responsive.min.css">
 
 <script src="/app.js"></script>
-<script src="/js/bootstrap.min.js"></script>
-<script src="/js/angular.min.js"></script>
-<style>
-body {
-	padding-top: 60px;
-}
-</style>
 </head>
 <body>
-	<div class="container" ng-controller="ChatController">
+	<div class="container">
 		<div class="navbar navbar-fixed-top navbar-inverse">
 			<div class="navbar-inner">
 				<div class="pull-right">
@@ -31,10 +24,191 @@ body {
 		</div>
 		<div class="row">
 			<div class="span3">
-				<img src="/img/restEasy.png" alt="RestEasy" height="100"
-					width="100">
+				<img src="/img/restEasy.png" alt="RestEasy" height="100" width="100">
 			</div>
 		</div>
+		<br /> <br />
+		<div class="row header-row">
+			<h2>
+				<a href="https://tools.ietf.org/html/rfc2616" target="#">HTTP
+					Standards</a> in RESTful Web Applications
+			</h2>
+		</div>
+		<div class="row text-row">The purpose of this demonstration is
+			to review some common principals of the HTTP standard, and namely,
+			how they can be leveraged in order to make our RESTful web
+			applications faster and more efficient.</div>
+		<div class="row text-row">This application also contains a
+			RESTful web application written with Spring-boot which can be used in
+			order to demonstrate some of the concepts discussed.</div>
+		<div class="row text-row">The RESTful demo uses the idea of a
+			simple project with a name and an owner. We will also reference this
+			concept in discussion. We will occasionally pretend that the project
+			model is more complex (e.g. imagine if it had related tasks, ect.)
+			but the project model in the actual demo does not contain any of the
+			more complex representations.</div>
+
+
+		<div class="row header-row">
+			<ul class="nav nav-list well">
+				<li class="nav-header">Index</li>
+				<li>1 - <a href="#theBigPicture" style="display: inline;">The
+						Big Picture</a>
+					<ul>
+						<li><a
+							href="#httpHeaders">HTTP Headers</a></li>
+						<li><a
+							href="#headMethod">HEAD method</a></li>
+					</ul>
+				</li>
+				<li>2</li>
+				<li>3</li>
+			</ul>
+		</div>
+
+
+		<br /> <br />
+		<div class="row">
+			<img src="/img/httpDecisionTree.png" alt="Http Decision Tree"
+				height="500" width="500">
+		</div>
+
+		<div class="row header-row">
+			<h3 id="theBigPicture">The Big Picture</h3>
+		</div>
+
+		<div class="row text-row">The above diagram is the entire HTTP
+			decision tree which we will reference throughout this demonstration.
+			We will zoom into individual sections of the image in order to
+			discuss them in more detail. Before we do so, let's discuss the
+			figurative "Big Picture".</div>
+		<div class="row text-row">
+			<ul>
+				<li>The first thing to ask is <b>Why?</b> Why should we follow
+					these standards and do we get out of it? The answer is simple:
+					speed and efficiency</a>
+				</li>
+				<li>A more complicated question is <b>How?</b> What is the
+					mechanism for for getting these benefits? In short, the answer is
+					the HEAD method and HTTP headers. Let's discuss this in more detail
+					below.</a>
+				</li>
+			</ul>
+		</div>
+
+		<div class="row header-row">
+			<h4 id="httpHeaders">HTTP Headers</h4>
+		</div>
+		<div class="row text-row">Both the client and the server need to
+			work with various HTTP headers in order to leverage the standard.
+			Some are controlled on the client side and considered on the server
+			while some are controlled on the server and consider by the client
+			side code.</div>
+
+		<div class="row text-row">
+			<ul class="nav nav-list well">
+				<li class="nav-header">Server Side</li>
+				<li>1 - <b>ETag</b>: A hash of the current state of the data
+					involved with resource )
+					<ul>
+						<li>Server should avoid recalculating this value. (i.e. it
+							should be persisted)</li>
+						<li>Might require multiple representations per entity (i.e.
+							request for a project with or without project tasks)</li>
+						<li>Not practical for end-points which return lists of
+							resources (i.e. How should we calculate the ETag for a list
+							projects?) Tip: returning the ETag of the last modified project
+							does not always work unless the last modified date is part of the
+							ETag hash (which is problematic in itself).)</li>
+					</ul>
+				</li>
+				<li>2 - <b>Last-Modified</b>: The date that a resource was last
+					modified
+					<ul>
+						<li>Server should persist this value</li>
+						<li>Might require multiple representations per entity (i.e.
+							request for a project with or without project tasks)</li>
+						<li>Much better suited than ETags for requests for lists of
+							resources</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+
+
+		<div class="row text-row">
+			<ul class="nav nav-list well">
+				<li class="nav-header">Client Side (Preconditions)</li>
+				<li>1 - <b>If-Match</b>
+					<ul>
+						<li>The value should be a previously returned ETag for the
+							given resource.</li>
+						<li>If the resource on the server currently does not match
+							the provided ETag then the <b>412-Preconditioned Failed</b>
+							response code would be returned by the server.
+						</li>
+						<li>Should work with HEAD, GET, PUT, DELETE and POST<a
+							href="#avoidingPOSTWithExisingResources">*</a>.
+						</li>
+					</ul>
+				</li>
+				<li>2 - <b>If-None-Match</b>
+					<ul>
+						<li>The value should be a previously returned ETag for the
+							given resource.</li>
+						<li>If the resource on the server currently does match the
+							provided ETag then the <b>412-Preconditioned Failed</b> response
+							code should be returned by the server.
+						</li>
+						<li>Should work with HEAD, GET, PUT, DELETE and POST<a
+							href="#avoidingPOSTWithExisingResources">*</a>.
+						</li>
+					</ul>
+				</li>
+				<li>3 - <b>If-Unmodified-Since</b>
+					<ul>
+						<li>The value should be <a
+							href="https://tools.ietf.org/html/rfc2616#section-14.29"
+							target="#">properly formatted date</a>.</li>
+						<li>If the resource on the server has been modified after the
+							the provided date then the <b>412-Preconditioned Failed</b>
+							response code should be returned by the server.
+						</li>
+						<li>Should work with HEAD, GET, PUT, DELETE and POST<a
+							href="#avoidingPOSTWithExisingResources">*</a>.
+						</li>
+					</ul>
+				</li>
+				<li>3 - <b>If-Unmodified-Since</b>
+					<ul>
+						<li>The value should be properly formatted date.</a></li>
+						<li>If the resource on the server has been not been modified
+							after the the provided date then the <b>412-Preconditioned
+								Failed</b> response code should be returned by the server.
+						</li>
+						<li>Should work with HEAD, GET, PUT, DELETE and POST<a
+							href="#avoidingPOSTWithExisingResources">*</a>.
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+
+
+		<div class="row header-row">
+			<h4 id="headMethod">HEAD Method</h4>
+		</div>
+		<div class="row text-row">The above headers can all work in
+			conjunction with the HTTP HEAD method. The HTTP HEAD method is
+			intended to undergo the same server side processing as a GET request,
+			but it ultimately does not return a response body. It should consider
+			all of the client side headers discussed above and return the server
+			side header exactly as it would for a similar GET request. This is a
+			great mechanism for retreiving meta data about a resource without
+			unnecessarily burdening our internal networks as well as the the data
+			plans of our users.</div>
+
+
 		<div class="row">
 			<div class="span3">
 				<br /> OPTIONS /project <br /> <br /> POST
