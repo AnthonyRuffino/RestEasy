@@ -32,10 +32,10 @@
 					Standards</a> in RESTful Web Applications
 			</h2>
 		</div>
-		<div class="row text-row">The purpose of this demonstration is
-			to review some common principals of the HTTP standard, and namely,
-			how they can be leveraged in order to make our RESTful web
-			applications faster and more efficient.</div>
+		<div class="row text-row">The purpose of this presentation is to
+			review some common principals of the HTTP standard, and namely, how
+			they can be leveraged in order to make our RESTful web applications
+			faster and more efficient.</div>
 		<div class="row text-row">This application also contains a
 			RESTful web application written with Spring-boot which can be used in
 			order to demonstrate some of the concepts discussed.</div>
@@ -53,14 +53,14 @@
 				<li>1 - <a href="#theBigPicture" style="display: inline;">The
 						Big Picture</a>
 					<ul>
-						<li><a
-							href="#httpHeaders">HTTP Headers</a></li>
-						<li><a
-							href="#headMethod">HEAD method</a></li>
+						<li><a href="#httpHeaders">HTTP Headers</a></li>
+						<li><a href="#headMethod">HEAD method</a></li>
 					</ul>
 				</li>
-				<li>2</li>
-				<li>3</li>
+				<li>2 - <a href="#postVsPut" style="display: inline;">Creating
+						and Updating - POST versus PUT</a></li>
+				<li>3 - <a href="#safeAndIdemotent" style="display: inline;">Safe
+						and Idempotent Methods</a></li>
 			</ul>
 		</div>
 
@@ -84,7 +84,7 @@
 			<ul>
 				<li>The first thing to ask is <b>Why?</b> Why should we follow
 					these standards and do we get out of it? The answer is simple:
-					speed and efficiency</a>
+					speed and efficiency.</a>
 				</li>
 				<li>A more complicated question is <b>How?</b> What is the
 					mechanism for for getting these benefits? In short, the answer is
@@ -167,7 +167,8 @@
 					<ul>
 						<li>The value should be <a
 							href="https://tools.ietf.org/html/rfc2616#section-14.29"
-							target="#">properly formatted date</a>.</li>
+							target="#">properly formatted date</a>.
+						</li>
 						<li>If the resource on the server has been modified after the
 							the provided date then the <b>412-Preconditioned Failed</b>
 							response code should be returned by the server.
@@ -202,9 +203,67 @@
 			but it ultimately does not return a response body. It should consider
 			all of the client side headers discussed above and return the server
 			side header exactly as it would for a similar GET request. This is a
-			great mechanism for retreiving meta data about a resource without
+			great mechanism for retrieving meta data about a resource without
 			unnecessarily burdening our internal networks as well as the the data
 			plans of our users.</div>
+
+
+		<div class="row header-row">
+			<h3 id="postVsPut">Creating and Updating - POST versus PUT</h3>
+		</div>
+
+		<img src="/img/postVsPut.png" alt="putVsPut"  width="600">
+
+		<div class="row text-row" id="avoidingPOSTWithExisingResources">Technically
+			speaking the HTTP standard allows for using both POST and PUT for
+			both creating and updating a resource. There is far too much nuance
+			involved when you allow this, and I highly recommend only allowing
+			POST for creating and PUT for updates. There are certainly benefits
+			to allowing both operations to be achieved via both methods, but the
+			level of complexity it brings to your API is usually not worth it.</div>
+		<div class="row text-row">
+			Additionally, the JSON Merge Patch format was introduced in <a
+				href="https://tools.ietf.org/html/rfc7396">RFC-7396</a>. This is
+			also add a layer of complexity, but if you really require granular
+			updates to portions of resources, this is likely a better approach. I
+			do not cover the PATCH method in this demonstration, and in absence
+			of supporting PATCH, I recommend that your API provide more granular
+			end-points to achieve this functionality (g.e. PUT
+			/projects/updateOwner).
+		</div>
+
+
+		<div class="row header-row" id="safeAndIdemotent">
+			<h3 id="postVsPut">Safe and Idempotent Methods</h3>
+		</div>
+
+		<img src="/img/safety.jpg" alt="Idempotent" width="100" style="padding-top:20px;">
+
+		<div class="row text-row"><a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1" target="#">Section 9.1.1</a> 
+		of the standard describes the convention of "safe methods" perfectly and concisely with the following: 
+		The convention has been established that the GET and HEAD methods SHOULD NOT have the significance of taking an 
+		action other than retrieval. These methods ought to be considered "safe". This allows user agents to represent 
+		other methods, such as POST, PUT and DELETE, in a special way, so that the user is made aware of the fact 
+		that a possibly unsafe action is being requested.</div>
+		
+		
+		<img src="/img/idempotent.jpg" alt="Idempotent" width="400" style="padding-top:20px;">
+		
+		<div class="row text-row">
+			<b>Idempotent</b>: <i>denoting an element of a set which is unchanged in value when multiplied or otherwise operated on by itself.</i>
+		</div>
+		
+		<div class="row text-row">
+			The above image, though funny in a "Yes I am a geek" sort of a way, is a bit misleading as to the nature of idempotency.
+			While it is true that the GET method is idempotent, that does not mean it ill always return the same value.  It is idempotent, because 
+			the state of the resource on the server will be the same no matter how many times the GET request is performed.  This is naturally true for GET
+			requests because they do not change the state of the resource; they are safe.
+		</div>
+		
+		<div class="row text-row">
+			Perhaps more interestingly, there are unsafe methds (PUT and DELETE) which are also idempotent.  This means that 
+			a client application can perform these operations multiple times without worrying about unintended consequences.
+		</div>
 
 
 		<div class="row">
