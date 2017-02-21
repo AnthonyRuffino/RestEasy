@@ -382,7 +382,7 @@
 						<li>If-Unmodified-Since</li>
 					</ul>
 				</li>
-				<li class="text-row"><a href="/api/projects" style="display: inline;">GET</a> /api/projects/{id}
+				<li class="text-row"><a href="/api/projects" style="display: inline;" target="#">GET</a> /api/projects/{id}
 					<ul>
 						<li>If-Match</li>
 						<li>If-None-Match</li>
@@ -407,20 +407,6 @@
 					</ul>
 				</li>
 			</ul>
-		</div>
-
-		<div class="row">
-			<div class="span3">
-				<br /> OPTIONS /project <br /> <br /> POST
-				/project?name=Test1&owner=Me <br /> <br /> PUT
-				/project?id=1,name=Test1-1 <br />[If-Match, If-None-Match,
-				If-Unmodified-Since, If-Modified-Since] <br /> <br /> DELETE
-				/project?id=1 <br />[If-Match, If-None-Match, If-Unmodified-Since,
-				If-Modified-Since] <br /> <br /> HEAD /project/1 <br />[If-Match,
-				If-Unmodified-Since, If-Modified-Since] <br /> <br /> GET
-				/project/1 <br />[If-Match, If-Unmodified-Since, If-Modified-Since]
-				<br /> <br />
-			</div>
 		</div>
 	</div>
 </body>
