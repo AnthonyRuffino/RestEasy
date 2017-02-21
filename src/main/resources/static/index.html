@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app>
+<html lang="en">
 <head>
 <title>RestEasy</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -61,6 +61,11 @@
 						and Updating - POST versus PUT</a></li>
 				<li>3 - <a href="#safeAndIdemotent" style="display: inline;">Safe
 						and Idempotent Methods</a></li>
+				<li>4 - <a href="#pitfalls" style="display: inline;">Pitfalls
+						and Special Considerations</a></li>
+				<li>5 - <a href="#skipped" style="display: inline;">What
+						did we skip?</a></li>
+				<li>6 - <a href="#demoAPI" style="display: inline;">Demo API Description/a></li>
 			</ul>
 		</div>
 
@@ -84,12 +89,12 @@
 			<ul>
 				<li>The first thing to ask is <b>Why?</b> Why should we follow
 					these standards and do we get out of it? The answer is simple:
-					speed and efficiency.</a>
+					speed and efficiency.
 				</li>
 				<li>A more complicated question is <b>How?</b> What is the
 					mechanism for for getting these benefits? In short, the answer is
 					the HEAD method and HTTP headers. Let's discuss this in more detail
-					below.</a>
+					below.
 				</li>
 			</ul>
 		</div>
@@ -180,7 +185,7 @@
 				</li>
 				<li>3 - <b>If-Unmodified-Since</b>
 					<ul>
-						<li>The value should be properly formatted date.</a></li>
+						<li>The value should be properly formatted date.</li>
 						<li>If the resource on the server has been not been modified
 							after the the provided date then the <b>412-Preconditioned
 								Failed</b> response code should be returned by the server.
@@ -212,7 +217,7 @@
 			<h3 id="postVsPut">Creating and Updating - POST versus PUT</h3>
 		</div>
 
-		<img src="/img/postVsPut.png" alt="putVsPut"  width="600">
+		<img src="/img/postVsPut.png" alt="putVsPut" width="600">
 
 		<div class="row text-row" id="avoidingPOSTWithExisingResources">Technically
 			speaking the HTTP standard allows for using both POST and PUT for
@@ -237,34 +242,172 @@
 			<h3 id="postVsPut">Safe and Idempotent Methods</h3>
 		</div>
 
-		<img src="/img/safety.jpg" alt="Idempotent" width="100" style="padding-top:20px;">
+		<img src="/img/safety.jpg" alt="Safety First" width="100"
+			style="padding-top: 20px;">
 
-		<div class="row text-row"><a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1" target="#">Section 9.1.1</a> 
-		of the standard describes the convention of "safe methods" perfectly and concisely with the following: 
-		The convention has been established that the GET and HEAD methods SHOULD NOT have the significance of taking an 
-		action other than retrieval. These methods ought to be considered "safe". This allows user agents to represent 
-		other methods, such as POST, PUT and DELETE, in a special way, so that the user is made aware of the fact 
-		that a possibly unsafe action is being requested.</div>
-		
-		
-		<img src="/img/idempotent.jpg" alt="Idempotent" width="400" style="padding-top:20px;">
-		
 		<div class="row text-row">
-			<b>Idempotent</b>: <i>denoting an element of a set which is unchanged in value when multiplied or otherwise operated on by itself.</i>
-		</div>
-		
-		<div class="row text-row">
-			The above image, though funny in a "Yes I am a geek" sort of a way, is a bit misleading as to the nature of idempotency.
-			While it is true that the GET method is idempotent, that does not mean it ill always return the same value.  It is idempotent, because 
-			the state of the resource on the server will be the same no matter how many times the GET request is performed.  This is naturally true for GET
-			requests because they do not change the state of the resource; they are safe.
-		</div>
-		
-		<div class="row text-row">
-			Perhaps more interestingly, there are unsafe methds (PUT and DELETE) which are also idempotent.  This means that 
-			a client application can perform these operations multiple times without worrying about unintended consequences.
+			<a
+				href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1"
+				target="#">Section 9.1.1</a> of the standard describes the
+			convention of "safe methods" perfectly and concisely with the
+			following: The convention has been established that the GET and HEAD
+			methods SHOULD NOT have the significance of taking an action other
+			than retrieval. These methods ought to be considered "safe". This
+			allows user agents to represent other methods, such as POST, PUT and
+			DELETE, in a special way, so that the user is made aware of the fact
+			that a possibly unsafe action is being requested.
 		</div>
 
+
+		<img src="/img/idempotent.jpg" alt="Idempotent" width="400"
+			style="padding-top: 20px;">
+
+		<div class="row text-row">
+			<b>Idempotent</b>: <i>denoting an element of a set which is
+				unchanged in value when multiplied or otherwise operated on by
+				itself.</i>
+		</div>
+
+		<div class="row text-row">The above image, though funny in a
+			"Yes I am a geek" sort of a way, is a bit misleading as to the nature
+			of idempotency. While it is true that the GET method is idempotent,
+			that does not mean it ill always return the same value. It is
+			idempotent, because the state of the resource on the server will be
+			the same no matter how many times the GET request is performed. This
+			is naturally true for GET requests because they do not change the
+			state of the resource; they are safe.</div>
+
+		<div class="row text-row">Perhaps more interestingly, there are
+			unsafe methds (PUT and DELETE) which are also idempotent. This means
+			that a client application can perform these operations multiple times
+			without worrying about unintended consequences.</div>
+
+
+		<div class="row header-row">
+			<h3 id="pitfalls">
+				Pitfalls and Special Considerations <img src="/img/pitfall.png"
+					alt="Pitfall" width="50">
+			</h3>
+		</div>
+
+		<div class="row text-row">When developing a RESTful API, there
+			are many issues you might encounter depending on the functionality
+			you wish to achieve as well as the limitation of your back and front
+			end systems. There are also some limitations involved with sticking
+			rigidly to the standard. It is helpful to take note of these pain
+			points so that you can design the proper solution with all involved
+			parties.</div>
+
+
+		<div class="row text-row">
+			<ul class="nav nav-list well">
+				<li><b>Returning lists of resources</b>: This can be
+					complicated when figuring out which ETag to return. It is my
+					recommendation that the use of the ETag be avoided altogether for
+					collections and instead the client should leverage the last
+					modified field.</li>
+				<li><b>Returning resources which contain lists</b>: This
+					present several issues with regards to performance and rigidity.
+					modified.
+					<ul>
+						<li>Performance: Calculating the ETag wehn any member of the
+							list changes can be bad for performance and can lead to
+							unnecessary refreshes on the client.</li>
+						<li>Rigidity: Each item in the list may have its own resource
+							end-point. Returning it as part of a list in the parent object
+							will make it impossible to return the ETag and Last Modified
+							fields for each element unless it is part of the payload. This is
+							against the standard.</li>
+						<li>Possible solution: Only return lists of IDs or URIs for
+							the sublists, avoid returning sub-lists altogether, have separate
+							end-points (or filter parameters) for returning different views
+							of the parent object.</li>
+					</ul></li>
+				<li><b>Knowing which status code/approach to use</b>: Exactly
+					how to respond in each use case is not always clear and and
+					sometimes it is a matter of preference.
+					<ul>
+						<li>POST and PUT: If your server does not allow POSTing to
+							existing resources or using PUT to create new resources, the
+							standard will not really cover which code you should use. I
+							choose to use 409-Conflict for both, but it is important that you
+							document your choice and make it clear to the consumers of your
+							API .</li>
+
+					</ul></li>
+				<li><b>Versioning</b>: It is wise to consider how your API
+					might change from the very beginning. If you have client
+					applications which will not be able to keep up with the change, you
+					should consider using a versioned URI system. If it is too late for
+					that or if you do not like that aesthetically, you can support
+					versioning with parameters and headers.</li>
+			</ul>
+		</div>
+
+
+		<div class="row header-row">
+			<h3 id="pitfalls">
+				What did we skip?<img src="/img/skipped.png" alt="Skipped"
+					width="50">
+			</h3>
+		</div>
+
+		<div class="row header-row">
+			<ul class="nav nav-list well">
+				<li>1 - MIME Types</li>
+				<li>2 - Languages</li>
+				<li>3 - Encoding</li>
+			</ul>
+		</div>
+
+
+
+		<div class="row header-row">
+			<h3 id="demoAPI">
+				Demo API Description<img src="/img/skipped.png" alt="Demo API"
+					width="50">
+			</h3>
+		</div>
+		<div class="row header-row">
+			<ul class="nav nav-list well">
+				<li class="nav-header">End-points</li>
+				<li class="text-row">OPTIONS /api/projects
+				<li class="text-row">POST /api/projects
+				</li>
+				<li class="text-row">HEAD /api/projects/{id}
+					<ul>
+						<li>If-Match</li>
+						<li>If-None-Match</li>
+						<li>If-Modified-Since</li>
+						<li>If-Unmodified-Since</li>
+					</ul>
+				</li>
+				<li class="text-row"><a href="/api/projects" style="display: inline;">GET</a> /api/projects/{id}
+					<ul>
+						<li>If-Match</li>
+						<li>If-None-Match</li>
+						<li>If-Modified-Since</li>
+						<li>If-Unmodified-Since</li>
+					</ul>
+				</li>
+				<li class="text-row">PUT /api/projects
+					<ul>
+						<li>If-Match</li>
+						<li>If-None-Match</li>
+						<li>If-Modified-Since</li>
+						<li>If-Unmodified-Since</li>
+					</ul>
+				</li>
+				<li class="text-row">DELETE /api/projects
+					<ul>
+						<li>If-Match</li>
+						<li>If-None-Match</li>
+						<li>If-Modified-Since</li>
+						<li>If-Unmodified-Since</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
 
 		<div class="row">
 			<div class="span3">

@@ -234,7 +234,7 @@ public class ProjectController {
 		try {
 			List<ProjectEntity> projectEntities = ProjectRepository.findAll();
 
-			setResponseHeadersAndValidateConditions(projectEntities, responseHeaders, requestHeaders, method);
+			setResponseHeadersAndValidateConditions(projectEntities, responseHeaders, requestHeaders, method, false);
 			if (method == RequestMethod.GET) {
 				List<Project> projects = ProjectRepository.toModels(projectEntities);
 				projectsResponse.setData(projects);
@@ -260,11 +260,11 @@ public class ProjectController {
 	private void setResponseHeadersAndValidateConditions(ProjectEntity projectEntities, HttpHeaders responseHeaders,
 			HttpHeaders requestHeaders, RequestMethod method) throws HttpRequestException {
 		setResponseHeadersAndValidateConditions(Arrays.asList(projectEntities), responseHeaders, requestHeaders,
-				method);
+				method, true);
 	}
 
 	private void setResponseHeadersAndValidateConditions(List<ProjectEntity> projectEntities,
-			HttpHeaders responseHeaders, HttpHeaders requestHeaders, RequestMethod method) throws HttpRequestException {
+			HttpHeaders responseHeaders, HttpHeaders requestHeaders, RequestMethod method, boolean includeETag) throws HttpRequestException {
 
 		Date lastModified = null;
 		String etag = null;
@@ -285,7 +285,7 @@ public class ProjectController {
 
 		responseHeaders.setLastModified(lastModified.getTime());
 
-		if (etag != null) {
+		if (etag != null && includeETag) {
 			responseHeaders.setETag(etag);
 		}
 
