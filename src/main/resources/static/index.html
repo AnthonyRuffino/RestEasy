@@ -29,18 +29,18 @@
 		<div class="row header-row">
 			<h2>
 				<a href="https://tools.ietf.org/html/rfc2616" target="#">HTTP
-					Standards</a> in RESTful Web Applications
+					Standards</a> in RESTful Web Services
 			</h2>
 		</div>
 		<div class="row text-row">The purpose of this presentation is to
 			review some common principals of the HTTP standard, and namely, how
-			they can be leveraged in order to make our RESTful web applications
+			they can be leveraged in order to make our RESTful web services
 			faster and more efficient.</div>
 		<div class="row text-row">This application also contains a
-			RESTful web application written with Spring-boot which can be used in
+			RESTful web service written with Spring-boot which can be used in
 			order to demonstrate some of the concepts discussed.</div>
 		<div class="row text-row">The RESTful demo uses the idea of a
-			simple project with a name and an owner. We will also reference this
+			simple project model with a name and an owner. We will also reference this
 			concept in discussion. We will occasionally pretend that the project
 			model is more complex (e.g. imagine if it had related tasks, ect.)
 			but the project model in the actual demo does not contain any of the
@@ -65,7 +65,7 @@
 						and Special Considerations</a></li>
 				<li>5 - <a href="#skipped" style="display: inline;">What
 						did we skip?</a></li>
-				<li>6 - <a href="#demoAPI" style="display: inline;">Demo API Description/a></li>
+				<li>6 - <a href="#demoAPI" style="display: inline;">Demo API Description</a></li>
 			</ul>
 		</div>
 
@@ -88,7 +88,7 @@
 		<div class="row text-row">
 			<ul>
 				<li>The first thing to ask is <b>Why?</b> Why should we follow
-					these standards and do we get out of it? The answer is simple:
+					these standards and do what we get out of it? The answer is simple:
 					speed and efficiency.
 				</li>
 				<li>A more complicated question is <b>How?</b> What is the
@@ -207,7 +207,7 @@
 			intended to undergo the same server side processing as a GET request,
 			but it ultimately does not return a response body. It should consider
 			all of the client side headers discussed above and return the server
-			side header exactly as it would for a similar GET request. This is a
+			side headers exactly as it would for a similar GET request. This is a
 			great mechanism for retrieving meta data about a resource without
 			unnecessarily burdening our internal networks as well as the the data
 			plans of our users.</div>
