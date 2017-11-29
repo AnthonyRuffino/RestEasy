@@ -24,16 +24,26 @@ repositories {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+configurations.all {
+   exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+}
+
+
 dependencies {
     // tag::jetty[]
     compile("org.springframework.boot:spring-boot-starter-web") {
         exclude module: "spring-boot-starter-tomcat"
+        exclude group: 'ch.qos.logback', module: 'logback-classic'
     }
     compile("org.springframework.boot:spring-boot-starter-jetty")
     // end::jetty[]
     // tag::actuator[]
     compile("org.springframework.boot:spring-boot-starter-actuator")
     // end::actuator[]
+    compile group: 'net.sf.dozer', name: 'dozer', version: '5.4.0'
+
+    
+
     testCompile("junit:junit")
 }
 
