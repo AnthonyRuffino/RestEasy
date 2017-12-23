@@ -47,3 +47,9 @@ dependencies {
     testCompile("junit:junit")
 }
 
+task prodRun {
+    bootRun { systemProperty "server.port", "80" }
+}
+prodRun.finalizedBy bootRun
+
+
