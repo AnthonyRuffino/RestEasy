@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if (($EUID != 0)); then
+  if ( [ ${1:-default} == "prod" ] ); then
+    sudo "$0" "$@"
+    exit;
+  fi
+fi
+
+./gradlew -Dspring.profiles.active=${1:-default} bootRun
